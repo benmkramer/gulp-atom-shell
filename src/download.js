@@ -4,6 +4,7 @@ var os = require('os');
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var semver = require('semver');
 var GitHub = require('github-releases');
 var ProgressBar = require('progress');
 
@@ -52,7 +53,15 @@ module.exports = function (opts, cb) {
 	}
 
 	var version = 'v' + opts.version;
-	var assetName = ['atom-shell', version, platform, arch].join('-') + '.zip';
+  var name;
+
+  if (semver.lt(opts.version, '0.25.2')) {
+    name = 'atom-shell';
+  } else {
+    name = 'electron';
+  }
+
+	var assetName = [name, version, platform, arch].join('-') + '.zip';
 
 	function download(assetPath, cb) {
 		github.getReleases({ tag_name: version }, function (err, releases) {
